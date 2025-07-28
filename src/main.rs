@@ -2,7 +2,6 @@ mod ws;
 mod aggregator;
 mod prefecture;
 mod window_aggregator;
-mod segtree;
 
 use tower_http::cors::CorsLayer;
 use crate::{
