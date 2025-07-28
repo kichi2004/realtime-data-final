@@ -1,0 +1,24 @@
+[package]
+name = "realtime-data-final"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.98"
+axum = { version = "0.8.4", features = ["ws"] }
+bytes = "1.10.1"
+chrono = "0.4.41"
+futures-util = "0.3.31"
+rmp-serde = "1.3.0"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+server = { path = "./server" }
+tokio = { version = "1.46.1", features = ["macros", "rt-multi-thread"] }
+tower-http = { version = "0.6.6", features = ["cors"] }
+segtree = { path = "./segtree" }
+
+[workspace]
+members = [
+    "segtree",
+    "server"
+]
