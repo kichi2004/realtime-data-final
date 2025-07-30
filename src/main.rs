@@ -36,6 +36,7 @@ use tokio::{
         broadcast::Sender,
     },
 };
+use tokio::time::Instant;
 use crate::prefecture::get_prefectures;
 
 pub(crate) struct AppState {
@@ -87,17 +88,26 @@ async fn main() {
         let mut reader = BufReader::new(socket);
 
         let mut buffer = [0; 256];
+        let mut data_cnt = 0usize;
+        let mut aggregate_time_total = 0u128;
         while let Ok(_) = reader.read_exact(&mut buffer[0..3]).await {
             let len = buffer[0] as usize;
             let total_size = 3 + 6 * len;
 
             let _ = reader.read_exact(&mut buffer[3..total_size]).await;
 
+            let start = Instant::now();
             let _ = aggregator.on_receive_data(Bytes::copy_from_slice(&buffer[..total_size]));
+            data_cnt += 1;
+            aggregate_time_total += start.elapsed().as_micros();
         }
+        println!("Average Process Time: {} μs (Total {} ms)", aggregate_time_total / data_cnt as u128, aggregate_time_total / 1000);
     });
 
-    let cors = CorsLayer::new().allow_origin(["http://localhost:5173".parse().unwrap()]);
+    let cors = CorsLayer::new().allow_origin([
+        "http://localhost:5173".parse().unwrap(),
+        "http://localhost:4173".parse().unwrap(),
+    ]);
 
     let app = Router::new()
         .route("/meta", get(meta))
